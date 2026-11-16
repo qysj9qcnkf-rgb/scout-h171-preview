@@ -3,14 +3,19 @@
   <head>
     <meta name="ls-base" content="/scout-h171-preview/admin/heliumdeploy.myshopify.com"><script>(function(){
 var B="/scout-h171-preview/admin/heliumdeploy.myshopify.com"+'/api',A="/scout-h171-preview"+'/api/',plain=window.fetch.bind(window);
+var ran=false;try{ran=sessionStorage.getItem('ls-disc-ran')==='1'}catch(e){}
 var f=function(k){return A+'k'+k.replace(/[^A-Za-z0-9._-]/g,'_')+'.json'};
 var j=function(c,b){return new Response(JSON.stringify(b),{status:c,headers:{'content-type':'application/json'}})};
 window.fetch=function(input,init){
   var u=typeof input==='string'?input:input instanceof URL?input.href:input.url,m=((init&&init.method)||(input&&input.method)||'GET').toUpperCase();
   try{u=new URL(u,location.href)}catch(e){return plain(input,init)}
   if(u.origin!==location.origin||u.pathname.indexOf(B)!==0)return plain(input,init);
-  if(m!=='GET'&&m!=='HEAD')return Promise.resolve(j(403,{error:'This preview is read-only: nothing is saved or sent.'}));
   var k=u.pathname.slice(B.length)+u.search;
+  // Discovery's Analyse (H171): answers with the store's real analysis, run on its real chats when the snapshot was made
+  // (the '/discovery/run' answer); from then on the Discovery view reads that result, as the app does after a run.
+  if(m==='POST'&&k==='/discovery/run')return plain(f('/discovery/run')).then(function(r){if(!r.ok)return j(403,{error:'This preview is read-only: nothing is saved or sent.'});ran=true;try{sessionStorage.setItem('ls-disc-ran','1')}catch(e){}return r});
+  if(m!=='GET'&&m!=='HEAD')return Promise.resolve(j(403,{error:'This preview is read-only: nothing is saved or sent.'}));
+  if(ran&&k==='/discovery')k='/discovery/run';
   return plain(f(k)).then(function(r){
     if(r.ok)return r;
     if(/^\/inbox\?page=\d+$/.test(k))return plain(f('/inbox?page=1'));
@@ -28,7 +33,7 @@ window.fetch=function(input,init){
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Unbounded:wght@800&family=Geist+Mono:wght@400;500&display=swap" />
-    <script type="module" crossorigin src="/scout-h171-preview/admin-assets/index-CSNEGkgH.js"></script>
+    <script type="module" crossorigin src="/scout-h171-preview/admin-assets/index-BUPjYaMB.js"></script>
     <link rel="stylesheet" crossorigin href="/scout-h171-preview/admin-assets/index-DuCGUUQE.css">
   </head>
   <body class="scout-app">
